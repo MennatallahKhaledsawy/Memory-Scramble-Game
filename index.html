@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Scramble Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Memory Scramble</h1>
+    
+    <div id="config-panel">
+        <label for="rows">Rows:</label>
+        <input type="number" id="rows" min="2" step="2">
+        
+        <label for="cols">Columns:</label>
+        <input type="number" id="cols" min="2">
+        
+        <label for="time">Timeout (seconds):</label>
+        <input type="number" id="time" min="10">
+        
+        <button id="start-btn">Start Game</button>
+    </div>
+
+    <div id="game-info">
+        <h2>Time Left: <span id="timer-display">0</span></h2>
+        <h3 id="message-display"></h3>
+    </div>
+
+    <div id="game-board" class="board"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
