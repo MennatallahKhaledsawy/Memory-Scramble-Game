@@ -37,7 +37,6 @@ function initializeGame() {
     generateBoard(rows, cols);
     startTimer();
 }
-
 function generateBoard(rows, cols) {
     // Member 2: Generate pairs, shuffle them, and render HTML cells here
 }
@@ -47,5 +46,27 @@ function handleCardClick(event) {
 }
 
 function startTimer() {
-    // Member 3: Implement countdown logic and game over state
+    // 1. Display the starting time immediately so it doesn't wait a second to show up
+    timerDisplay.innerText = timeLeft;
+
+    // 2. Start the countdown loop
+    timerInterval = setInterval(() => {
+        timeLeft--; // Subtract 1 second
+        timerDisplay.innerText = timeLeft; // Update the HTML screen
+
+        // 3. Check for Game Over condition
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval); // Stop the clock from counting into negative numbers
+            
+            // Lock the board so the player can't click any more cards
+            
+            if (typeof lockBoard !== 'undefined') {
+                lockBoard = true; 
+            }
+            
+            // Display the required game-over message
+            messageDisplay.innerText = "Game Over! You ran out of time.";
+            messageDisplay.style.color = "red";
+        }
+    },1000); // 1000 milliseconds = 1 second
 }
