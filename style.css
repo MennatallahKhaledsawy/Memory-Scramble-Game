@@ -1,10 +1,19 @@
 /* Basic game board styling */
+/* The grid track count comes from CSS variables that script.js sets
+   per game, so JS doesn't have to write inline style strings. */
 #game-board {
     margin: 20px auto;
     max-width: 800px;
     background-color: #f0f0f0;
     padding: 10px;
     border-radius: 8px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 4), 1fr);
+    grid-template-rows: repeat(var(--rows, 4), 1fr);
+    gap: 10px;
 }
 
 /* Card container styling */
@@ -19,11 +28,26 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.card {
+    cursor: pointer;
+}
+
 .card img {
     width: 100%;
     height: 100%;
     object-fit: cover; /* Ensures images fill the square without stretching */
     transition: transform 0.3s ease; /* Optional: smooth flipping effect */
+}
+
+/* Win / lose status colors live here so the JS just toggles a class */
+.message {
+    font-weight: bold;
+}
+.message--win {
+    color: green;
+}
+.message--lose {
+    color: red;
 }
 
 /* Optional hover effect */

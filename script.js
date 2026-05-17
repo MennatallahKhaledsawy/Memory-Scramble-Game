@@ -73,6 +73,7 @@ function initializeGame() {
     flippedCards = [];
     lockBoard = false;
     messageDisplay.innerText = '';
+    messageDisplay.className = 'message';
     timeLeft = time;
 
     totalPairs = (rows * cols) / 2;
@@ -82,10 +83,11 @@ function initializeGame() {
 }
 function generateBoard(rows, cols) {
     // 1. Set up the CSS Grid dynamically based on user input
-    boardElement.style.display = 'grid';
-    boardElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    boardElement.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-    boardElement.style.gap = `${BOARD_GAP_PX}px`;
+    // Hand the row/column counts to CSS via custom properties; the .board
+    // class in style.css reads them and the actual grid rules live there.
+    boardElement.style.setProperty('--rows', rows);
+    boardElement.style.setProperty('--cols', cols);
+    boardElement.style.setProperty('--gap', `${BOARD_GAP_PX}px`);
 
     // 2. Create the pairs of image IDs
     let cardValues = [];
@@ -112,9 +114,7 @@ function generateBoard(rows, cols) {
         
         const img = document.createElement('img');
         img.src = COVER_IMAGE; // All cards start face-down
-        img.style.width = '100%'; // Ensure it fits the grid cell
-        img.style.cursor = 'pointer';
-        
+
         card.appendChild(img);
         card.addEventListener('click', handleCardClick);
         boardElement.appendChild(card);
@@ -157,9 +157,9 @@ function checkForMatch() {
 
         // Check if the game is won
         if (matchedPairs === totalPairs) {
-            clearInterval(timerInterval); 
+            clearInterval(timerInterval);
             messageDisplay.innerText = "Congratulations! You found all matches!";
-            messageDisplay.style.color = "green";
+            messageDisplay.className = 'message message--win';
         }
     } else {
         // Not a match: wait a moment, then flip them back over.
@@ -197,7 +197,7 @@ function startTimer() {
 
             // Display the required game-over message
             messageDisplay.innerText = "Game Over! You ran out of time.";
-            messageDisplay.style.color = "red";
+            messageDisplay.className = 'message message--lose';
         }
     }, 1000);
 }
