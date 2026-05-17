@@ -19,6 +19,13 @@ const startBtn = document.getElementById('start-btn');
 const boardElement = document.getElementById('game-board');
 const timerDisplay = document.getElementById('timer-display');
 const messageDisplay = document.getElementById('message-display');
+const errorDisplay = document.getElementById('error-message');
+
+// Show a validation error inline next to the config inputs.
+// Using textContent (not innerHTML) keeps user input from being interpreted as HTML.
+function showError(message) {
+    errorDisplay.textContent = message;
+}
 
 // Event Listener for Game Start
 startBtn.addEventListener('click', initializeGame);
@@ -26,21 +33,42 @@ startBtn.addEventListener('click', initializeGame);
 function initializeGame() {
     const rows = parseInt(document.getElementById('rows').value);
     const cols = parseInt(document.getElementById('cols').value);
-    timeLeft = parseInt(document.getElementById('time').value);
+    const time = parseInt(document.getElementById('time').value);
 
     // Validation
-    if ((rows * cols) % 2 !== 0) {
-        alert("Board size (rows * columns) must be an even number!");
+    // Reject anything outside sensible ranges, and reject boards that would
+    // need more pairs than we have images for (which used to silently break
+    // matching because the same imageId would appear in 4+ cards).
+    if (!Number.isFinite(rows) || !Number.isFinite(cols) || !Number.isFinite(time)) {
+        showError("Please fill in rows, columns, and timeout with numbers.");
         return;
     }
+    if (rows < 2 || rows > 10 || cols < 2 || cols > 10) {
+        showError("Rows and columns must be between 2 and 10.");
+        return;
+    }
+    if (time < 10 || time > 600) {
+        showError("Timeout must be between 10 and 600 seconds.");
+        return;
+    }
+    if ((rows * cols) % 2 !== 0) {
+        showError("Board size (rows * columns) must be an even number!");
+        return;
+    }
+    if ((rows * cols) / 2 > AVAILABLE_IMAGES) {
+        showError(`Board too large: only ${AVAILABLE_IMAGES} unique images available (max ${AVAILABLE_IMAGES * 2} cards).`);
+        return;
+    }
+    showError('');
 
     // Reset state
     clearInterval(timerInterval);
-    boardElement.innerHTML = '';
+    boardElement.replaceChildren();
     matchedPairs = 0;
     flippedCards = [];
     messageDisplay.innerText = '';
-    
+    timeLeft = time;
+
     totalPairs = (rows * cols) / 2;
 
     generateBoard(rows, cols);

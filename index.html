@@ -11,15 +11,18 @@
     
     <div id="config-panel">
         <label for="rows">Rows:</label>
-        <input type="number" id="rows" min="2" step="2">
-        
+        <input type="number" id="rows" min="2" max="10" step="2">
+
         <label for="cols">Columns:</label>
-        <input type="number" id="cols" min="2">
-        
+        <input type="number" id="cols" min="2" max="10">
+
         <label for="time">Timeout (seconds):</label>
-        <input type="number" id="time" min="10">
-        
+        <input type="number" id="time" min="10" max="600" value="60">
+
         <button id="start-btn">Start Game</button>
+
+        <!-- Inline validation message shown in place of a blocking alert() -->
+        <div id="error-message" role="alert"></div>
     </div>
 
     <div id="game-info">
