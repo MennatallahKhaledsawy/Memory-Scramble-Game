@@ -1,3 +1,16 @@
+/* Page reset: trim default browser margins so we can budget the
+   viewport exactly between header chrome and the board. */
+html, body {
+    margin: 0;
+}
+body {
+    min-height: 100vh;
+}
+h1 {
+    margin: 8px 0;
+    text-align: center;
+}
+
 /* Make the config panel wrap nicely on narrow screens instead of
    overflowing horizontally. */
 #config-panel {
@@ -10,12 +23,30 @@
     padding: 0 10px;
 }
 
+/* Center the game info row without huge default heading margins. */
+#game-info {
+    text-align: center;
+}
+#game-info h2 {
+    margin: 6px 0;
+}
+#game-info h3 {
+    margin: 4px 0;
+    min-height: 1.2em;
+}
+
 /* Basic game board styling */
 /* The grid track count comes from CSS variables that script.js sets
-   per game, so JS doesn't have to write inline style strings. */
+   per game, so JS doesn't have to write inline style strings.
+   The board's width is capped by either 95vw or the height the
+   viewport has left over (converted via the board's column/row ratio),
+   whichever is smaller, so the page never has to scroll regardless of
+   which axis is the bottleneck. aspect-ratio: cols/rows then keeps
+   the cells square. */
 #game-board {
-    margin: 20px auto;
-    width: min(800px, 95vw);
+    margin: 10px auto;
+    width: min(95vw, calc((100svh - 260px) * var(--cols, 4) / var(--rows, 4)));
+    aspect-ratio: var(--cols, 4) / var(--rows, 4);
     background-color: #f0f0f0;
     padding: 10px;
     border-radius: 8px;
@@ -23,6 +54,8 @@
 }
 
 .board {
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-columns: repeat(var(--cols, 4), 1fr);
     grid-template-rows: repeat(var(--rows, 4), 1fr);
@@ -32,13 +65,18 @@
 /* Card container styling */
 /* The card is a perspective box that holds an inner element which
    actually rotates. The two faces sit on top of each other and one is
-   pre-rotated 180deg so we always see the front first. */
+   pre-rotated 180deg so we always see the front first.
+   Cell dimensions come from the grid (the board sets its own aspect
+   ratio so cells are approximately square), so we don't pin a card
+   aspect-ratio here - that used to force cards taller than their cell
+   and push the page into a scroll. */
 .card {
-    aspect-ratio: 1 / 1; /* Keeps the cards perfectly square */
     border-radius: 5px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     cursor: pointer;
     perspective: 600px;
+    min-width: 0;
+    min-height: 0;
 }
 
 .card__inner {
@@ -139,6 +177,9 @@
     }
     #game-board {
         padding: 6px;
+        /* Mobile chrome is taller because the config panel stacks,
+           so reserve more vertical space when capping the board width. */
+        width: min(95vw, calc((100svh - 360px) * var(--cols, 4) / var(--rows, 4)));
     }
     .board {
         gap: 6px;
