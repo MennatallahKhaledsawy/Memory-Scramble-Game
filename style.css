@@ -1,12 +1,25 @@
+/* Make the config panel wrap nicely on narrow screens instead of
+   overflowing horizontally. */
+#config-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
 /* Basic game board styling */
 /* The grid track count comes from CSS variables that script.js sets
    per game, so JS doesn't have to write inline style strings. */
 #game-board {
     margin: 20px auto;
-    max-width: 800px;
+    width: min(800px, 95vw);
     background-color: #f0f0f0;
     padding: 10px;
     border-radius: 8px;
+    box-sizing: border-box;
 }
 
 .board {
@@ -85,4 +98,25 @@
 }
 #error-message:empty {
     display: none;
+}
+
+/* Small screens: stack the config inputs vertically, tighten the board
+   padding and shrink the headings so the layout fits a phone width. */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    h2 {
+        font-size: 1.1rem;
+    }
+    #config-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #game-board {
+        padding: 6px;
+    }
+    .board {
+        gap: 6px;
+    }
 }
