@@ -100,11 +100,8 @@ function handleCardClick(event) {
         checkForMatch();
     }
 }
-
-
-function startTimer() {
-    // 1. Display the starting time immediately so it doesn't wait a second to show up
-    timerDisplay.innerText = timeLeft;
+function checkForMatch() {
+    lockBoard = true; 
 
     let isMatch = flippedCards[0].dataset.value === flippedCards[1].dataset.value;
 
@@ -131,9 +128,34 @@ function startTimer() {
             flippedCards[1].classList.remove('flipped');
             flippedCards[1].querySelector('img').src = 'images/cover.jpg';
             
+            flippedCards = [];
+            lockBoard = false; // Unlock board
+        }, 1000); 
+    }
+}
+
+function startTimer() {
+    // 1. Display the starting time immediately so it doesn't wait a second to show up
+    timerDisplay.innerText = timeLeft;
+
+    // 2. Start the countdown loop
+    timerInterval = setInterval(() => {
+        timeLeft--; // Subtract 1 second
+        timerDisplay.innerText = timeLeft; // Update the HTML screen
+
+        // 3. Check for Game Over condition
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval); // Stop the clock from counting into negative numbers
+            
+            // Lock the board so the player can't click any more cards
+            
+            if (typeof lockBoard !== 'undefined') {
+                lockBoard = true; 
+            }
+            
             // Display the required game-over message
             messageDisplay.innerText = "Game Over! You ran out of time.";
             messageDisplay.style.color = "red";
         }
-    },1000); 
+    },1000);; 
 }
