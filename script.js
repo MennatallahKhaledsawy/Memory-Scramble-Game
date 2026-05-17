@@ -37,6 +37,20 @@ function showError(message) {
 startBtn.addEventListener('click', initializeGame);
 resetBtn.addEventListener('click', initializeGame);
 
+// Difficulty presets
+// One delegated click handler on the preset row reads the rows / cols /
+// time from data attributes on the clicked button, fills the inputs,
+// and starts a new game. Anything that fails range validation falls
+// through to the inline error message like a manual entry would.
+document.getElementById('presets').addEventListener('click', (event) => {
+    const target = event.target.closest('button[data-rows]');
+    if (!target) return;
+    document.getElementById('rows').value = target.dataset.rows;
+    document.getElementById('cols').value = target.dataset.cols;
+    document.getElementById('time').value = target.dataset.time;
+    initializeGame();
+});
+
 function initializeGame() {
     const rows = parseInt(document.getElementById('rows').value);
     const cols = parseInt(document.getElementById('cols').value);

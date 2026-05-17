@@ -22,6 +22,15 @@
         <button id="start-btn">Start Game</button>
         <button id="reset-btn" hidden>Reset</button>
 
+        <!-- Quick difficulty presets - capped at 4x5 because we only ship
+             10 unique images, which limits us to 10 pairs (20 cards). -->
+        <div id="presets">
+            <span>Presets:</span>
+            <button type="button" data-rows="2" data-cols="2" data-time="30">Easy</button>
+            <button type="button" data-rows="4" data-cols="4" data-time="60">Medium</button>
+            <button type="button" data-rows="4" data-cols="5" data-time="45">Hard</button>
+        </div>
+
         <!-- Inline validation message shown in place of a blocking alert() -->
         <div id="error-message" role="alert"></div>
     </div>

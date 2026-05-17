@@ -89,6 +89,23 @@
     transform: scale(1.05);
 }
 
+/* Difficulty preset buttons sit in their own row inside the config panel */
+#presets {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    flex-basis: 100%;
+    margin-top: 4px;
+}
+#presets span {
+    font-weight: bold;
+    color: #555;
+}
+#presets button {
+    padding: 4px 10px;
+}
+
 /* Live score readout sits between the timer and the win/lose message */
 #score-display {
     font-size: 1rem;
