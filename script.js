@@ -8,6 +8,7 @@ const cardImageSrc = (id) => `images/${id}.jpeg`;
 
 // Global State Variables
 let timerInterval = null;
+let flipBackTimeout = null;
 let timeLeft;
 let flippedCards = [];
 let matchedPairs = 0;
@@ -62,10 +63,15 @@ function initializeGame() {
     showError('');
 
     // Reset state
+    // Cancel any in-flight timers from the previous game so a pending
+    // flip-back or countdown tick cannot mutate the new board mid-game.
     clearInterval(timerInterval);
+    clearTimeout(flipBackTimeout);
+    flipBackTimeout = null;
     boardElement.replaceChildren();
     matchedPairs = 0;
     flippedCards = [];
+    lockBoard = false;
     messageDisplay.innerText = '';
     timeLeft = time;
 
@@ -156,8 +162,10 @@ function checkForMatch() {
             messageDisplay.style.color = "green";
         }
     } else {
-        // Not a match: wait a moment, then flip them back over
-        setTimeout(() => {
+        // Not a match: wait a moment, then flip them back over.
+        // Capture the timeout id so initializeGame() can cancel it if the
+        // player starts a new game before the cards flip back.
+        flipBackTimeout = setTimeout(() => {
             flippedCards[0].classList.remove('flipped');
             flippedCards[0].querySelector('img').src = COVER_IMAGE;
 
@@ -166,6 +174,7 @@ function checkForMatch() {
 
             flippedCards = [];
             lockBoard = false; // Unlock board
+            flipBackTimeout = null;
         }, FLIP_BACK_DELAY_MS);
     }
 }
