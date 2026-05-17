@@ -1,5 +1,13 @@
+// Game Constants
+// Magic numbers and asset paths kept together so they are easy to tweak.
+const FLIP_BACK_DELAY_MS = 1000;
+const BOARD_GAP_PX = 10;
+const AVAILABLE_IMAGES = 10;
+const COVER_IMAGE = 'images/cover.jpg';
+const cardImageSrc = (id) => `images/${id}.jpeg`;
+
 // Global State Variables
-let timerInterval;
+let timerInterval = null;
 let timeLeft;
 let flippedCards = [];
 let matchedPairs = 0;
@@ -43,14 +51,14 @@ function generateBoard(rows, cols) {
     boardElement.style.display = 'grid';
     boardElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     boardElement.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-    boardElement.style.gap = '10px';
+    boardElement.style.gap = `${BOARD_GAP_PX}px`;
 
     // 2. Create the pairs of image IDs
     let cardValues = [];
     for (let i = 0; i < totalPairs; i++) {
-        // We use % 10 so if the user makes a board larger than 20 cards, 
+        // We use % AVAILABLE_IMAGES so if the user makes a board larger than 20 cards,
         // the images (0-9) will safely repeat without crashing the game.
-        let imageId = i % 10; 
+        let imageId = i % AVAILABLE_IMAGES;
         cardValues.push(imageId, imageId);
     }
 
@@ -69,7 +77,7 @@ function generateBoard(rows, cols) {
         card.dataset.value = cardValues[i];
         
         const img = document.createElement('img');
-        img.src = 'images/cover.jpg'; // All cards start face-down
+        img.src = COVER_IMAGE; // All cards start face-down
         img.style.width = '100%'; // Ensure it fits the grid cell
         img.style.cursor = 'pointer';
         
@@ -91,7 +99,7 @@ function handleCardClick(event) {
     // Flip the card to show its actual image
     clickedCard.classList.add('flipped');
     const img = clickedCard.querySelector('img');
-    img.src = `images/${clickedCard.dataset.value}.jpeg`; 
+    img.src = cardImageSrc(clickedCard.dataset.value);
 
     flippedCards.push(clickedCard);
 
@@ -120,17 +128,17 @@ function checkForMatch() {
             messageDisplay.style.color = "green";
         }
     } else {
-        // Not a match: wait 1 second, then flip them back over
+        // Not a match: wait a moment, then flip them back over
         setTimeout(() => {
             flippedCards[0].classList.remove('flipped');
-            flippedCards[0].querySelector('img').src = 'images/cover.jpg';
-            
+            flippedCards[0].querySelector('img').src = COVER_IMAGE;
+
             flippedCards[1].classList.remove('flipped');
-            flippedCards[1].querySelector('img').src = 'images/cover.jpg';
-            
+            flippedCards[1].querySelector('img').src = COVER_IMAGE;
+
             flippedCards = [];
             lockBoard = false; // Unlock board
-        }, 1000); 
+        }, FLIP_BACK_DELAY_MS);
     }
 }
 
@@ -146,16 +154,13 @@ function startTimer() {
         // 3. Check for Game Over condition
         if (timeLeft <= 0) {
             clearInterval(timerInterval); // Stop the clock from counting into negative numbers
-            
+
             // Lock the board so the player can't click any more cards
-            
-            if (typeof lockBoard !== 'undefined') {
-                lockBoard = true; 
-            }
-            
+            lockBoard = true;
+
             // Display the required game-over message
             messageDisplay.innerText = "Game Over! You ran out of time.";
             messageDisplay.style.color = "red";
         }
-    },1000);; 
+    }, 1000);
 }
