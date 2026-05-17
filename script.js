@@ -2,9 +2,32 @@
 // Magic numbers and asset paths kept together so they are easy to tweak.
 const FLIP_BACK_DELAY_MS = 1000;
 const BOARD_GAP_PX = 10;
-const AVAILABLE_IMAGES = 10;
-const COVER_IMAGE = 'images/cover.jpg';
-const cardImageSrc = (id) => `images/${id}.jpeg`;
+
+// Card categories
+// Each category is either a list of image paths or a list of emoji that
+// the back face renders. Add a new category by dropping a new entry here
+// and a matching <option> in index.html - no other code change required.
+const CATEGORIES = {
+    food: {
+        type: 'image',
+        items: Array.from({ length: 10 }, (_, i) => `images/${i}.jpeg`),
+    },
+    animals: {
+        type: 'image',
+        items: [
+            'images/animals/dog.jpg',
+            'images/animals/cat.jpg',
+            'images/animals/lion.jpg',
+            'images/animals/tiger.jpg',
+            'images/animals/bear.jpg',
+            'images/animals/panda.jpg',
+            'images/animals/koala.jpg',
+            'images/animals/fox.jpg',
+            'images/animals/rabbit.jpg',
+            'images/animals/hamster.jpg',
+        ],
+    },
+};
 
 // Global State Variables
 let timerInterval = null;
@@ -14,6 +37,9 @@ let flippedCards = [];
 let matchedPairs = 0;
 let totalPairs = 0;
 let lockBoard = false;
+// The category chosen for the current game (set in initializeGame, used by
+// generateBoard to pick image vs emoji items for the card backs).
+let activeCategory = CATEGORIES.food;
 
 // DOM Elements
 const startBtn = document.getElementById('start-btn');
@@ -24,6 +50,7 @@ const messageDisplay = document.getElementById('message-display');
 const errorDisplay = document.getElementById('error-message');
 const matchesEl = document.getElementById('matches');
 const totalEl = document.getElementById('total');
+const categorySelect = document.getElementById('category');
 
 // Show a validation error inline next to the config inputs.
 // Using textContent (not innerHTML) keeps user input from being interpreted as HTML.
@@ -37,17 +64,17 @@ function showError(message) {
 startBtn.addEventListener('click', initializeGame);
 resetBtn.addEventListener('click', initializeGame);
 
-// Difficulty presets
-// One delegated click handler on the preset row reads the rows / cols /
-// time from data attributes on the clicked button, fills the inputs,
-// and starts a new game. Anything that fails range validation falls
-// through to the inline error message like a manual entry would.
-document.getElementById('presets').addEventListener('click', (event) => {
-    const target = event.target.closest('button[data-rows]');
-    if (!target) return;
-    document.getElementById('rows').value = target.dataset.rows;
-    document.getElementById('cols').value = target.dataset.cols;
-    document.getElementById('time').value = target.dataset.time;
+// Difficulty preset dropdown
+// Picking Easy / Medium / Hard reads the rows / cols / time from the
+// option's data attributes, fills the inputs, and starts a new game.
+// The "Custom" option carries no data attributes and is a no-op so the
+// player can keep tweaking the inputs manually.
+document.getElementById('difficulty').addEventListener('change', (event) => {
+    const opt = event.target.selectedOptions[0];
+    if (!opt || !opt.dataset.rows) return;
+    document.getElementById('rows').value = opt.dataset.rows;
+    document.getElementById('cols').value = opt.dataset.cols;
+    document.getElementById('time').value = opt.dataset.time;
     initializeGame();
 });
 
@@ -55,11 +82,15 @@ function initializeGame() {
     const rows = parseInt(document.getElementById('rows').value);
     const cols = parseInt(document.getElementById('cols').value);
     const time = parseInt(document.getElementById('time').value);
+    // Pick up the chosen category (falls back to food if the option is
+    // somehow unknown - keeps the game playable even with stale HTML).
+    activeCategory = CATEGORIES[categorySelect.value] || CATEGORIES.food;
+    const maxPairs = activeCategory.items.length;
 
     // Validation
     // Reject anything outside sensible ranges, and reject boards that would
-    // need more pairs than we have images for (which used to silently break
-    // matching because the same imageId would appear in 4+ cards).
+    // need more pairs than the active category supplies (which used to
+    // silently break matching because the same item would appear in 4+ cards).
     if (!Number.isFinite(rows) || !Number.isFinite(cols) || !Number.isFinite(time)) {
         showError("Please fill in rows, columns, and timeout with numbers.");
         return;
@@ -76,8 +107,8 @@ function initializeGame() {
         showError("Board size (rows * columns) must be an even number!");
         return;
     }
-    if ((rows * cols) / 2 > AVAILABLE_IMAGES) {
-        showError(`Board too large: only ${AVAILABLE_IMAGES} unique images available (max ${AVAILABLE_IMAGES * 2} cards).`);
+    if ((rows * cols) / 2 > maxPairs) {
+        showError(`Board too large: this category only has ${maxPairs} unique items (max ${maxPairs * 2} cards).`);
         return;
     }
     showError('');
@@ -115,13 +146,15 @@ function generateBoard(rows, cols) {
     boardElement.style.setProperty('--cols', cols);
     boardElement.style.setProperty('--gap', `${BOARD_GAP_PX}px`);
 
-    // 2. Create the pairs of image IDs
+    // 2. Create the pairs of item IDs (indices into the active category)
+    // We use % items.length so if a board ever exceeds the category size
+    // (shouldn't happen thanks to validation, but just in case) the items
+    // repeat safely instead of producing undefined card backs.
+    const items = activeCategory.items;
     let cardValues = [];
     for (let i = 0; i < totalPairs; i++) {
-        // We use % AVAILABLE_IMAGES so if the user makes a board larger than 20 cards,
-        // the images (0-9) will safely repeat without crashing the game.
-        let imageId = i % AVAILABLE_IMAGES;
-        cardValues.push(imageId, imageId);
+        let itemId = i % items.length;
+        cardValues.push(itemId, itemId);
     }
 
     // 3. Shuffle the cards (Fisher-Yates Shuffle)
@@ -145,19 +178,25 @@ function generateBoard(rows, cols) {
         const inner = document.createElement('div');
         inner.classList.add('card__inner');
 
+        // Front face is purely CSS-styled (gradient + "?" via ::before),
+        // so we no longer load images/cover.jpg per card.
         const front = document.createElement('div');
         front.classList.add('card__face', 'card__face--front');
-        const frontImg = document.createElement('img');
-        frontImg.src = COVER_IMAGE;
-        frontImg.alt = '';
-        front.appendChild(frontImg);
 
+        // Back face: render an <img> for image categories, or the emoji
+        // glyph as text for emoji categories. textContent (never innerHTML)
+        // keeps any future user-supplied label safe from HTML injection.
         const back = document.createElement('div');
         back.classList.add('card__face', 'card__face--back');
-        const backImg = document.createElement('img');
-        backImg.src = cardImageSrc(cardValues[i]);
-        backImg.alt = '';
-        back.appendChild(backImg);
+        if (activeCategory.type === 'image') {
+            const backImg = document.createElement('img');
+            backImg.src = activeCategory.items[cardValues[i]];
+            backImg.alt = '';
+            back.appendChild(backImg);
+        } else {
+            back.classList.add('card__face--emoji');
+            back.textContent = activeCategory.items[cardValues[i]];
+        }
 
         inner.appendChild(front);
         inner.appendChild(back);

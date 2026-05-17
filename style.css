@@ -1,55 +1,211 @@
-/* Page reset: trim default browser margins so we can budget the
-   viewport exactly between header chrome and the board. */
+/* Color palette
+   --bg-1 / --bg-2 drive the animated page gradient.
+   --accent / --accent-2 are used by buttons, score and the card cover. */
+:root {
+    --bg-1: #6a11cb;
+    --bg-2: #fc5c7d;
+    --accent: #7b2ff7;
+    --accent-2: #f107a3;
+    --surface: rgba(255, 255, 255, 0.85);
+    --surface-strong: rgba(255, 255, 255, 0.95);
+    --ink: #1f1235;
+    --muted: #6b5b8c;
+    --danger: #e63946;
+    --success: #2ecc71;
+    --radius: 14px;
+    --shadow-lg: 0 12px 30px rgba(40, 10, 80, 0.25);
+    --shadow-sm: 0 4px 12px rgba(40, 10, 80, 0.15);
+}
+
+/* Page reset + animated gradient backdrop */
 html, body {
     margin: 0;
 }
 body {
     min-height: 100vh;
-}
-h1 {
-    margin: 8px 0;
-    text-align: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2), #ff9966, #6a11cb);
+    background-size: 400% 400%;
+    animation: bg-shift 18s ease infinite;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Make the config panel wrap nicely on narrow screens instead of
-   overflowing horizontally. */
+@keyframes bg-shift {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+}
+
+h1 {
+    margin: 16px 0 8px;
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Config panel: frosted glass card laid out as vertical rows so each
+   group of controls (fields, actions, presets) has its own line. */
 #config-panel {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    max-width: 800px;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 820px;
     margin: 0 auto;
-    padding: 0 10px;
+    padding: 16px 20px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+}
+.config-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 14px;
+}
+.config-row--actions {
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(123, 47, 247, 0.2);
 }
 
-/* Center the game info row without huge default heading margins. */
+/* Each input + its label stacks vertically as one "field" tile */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.field label {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+.field input[type="number"],
+.field select {
+    padding: 8px 10px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field input[type="number"] {
+    width: 90px;
+}
+.field select {
+    /* Padding leaves room for the native arrow. */
+    cursor: pointer;
+    padding-right: 28px;
+}
+.field input[type="number"]:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(123, 47, 247, 0.2);
+}
+
+/* Buttons: flat solid color, no gradient and no hover lift. The card
+   surfaces still animate on hover further down. */
+#config-panel button {
+    border: none;
+    cursor: pointer;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #fff;
+    background: var(--accent);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Start is the focal action - bigger pill, sits dead-center of the
+   actions row. Reset is the smaller outlined secondary next to it. */
+#start-btn {
+    padding: 12px 36px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+#reset-btn {
+    background: #fff;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+}
+
+/* Center the game info row, white text on the gradient backdrop. */
 #game-info {
     text-align: center;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 #game-info h2 {
-    margin: 6px 0;
+    margin: 10px 0 4px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+#game-info h2 span {
+    display: inline-block;
+    min-width: 2ch;
+    padding: 2px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-left: 6px;
 }
 #game-info h3 {
-    margin: 4px 0;
+    margin: 6px 0;
     min-height: 1.2em;
+    font-size: 1.1rem;
 }
 
-/* Basic game board styling */
-/* The grid track count comes from CSS variables that script.js sets
-   per game, so JS doesn't have to write inline style strings.
-   The board's width is capped by either 95vw or the height the
-   viewport has left over (converted via the board's column/row ratio),
-   whichever is smaller, so the page never has to scroll regardless of
-   which axis is the bottleneck. aspect-ratio: cols/rows then keeps
-   the cells square. */
+/* Live score readout - solid pill so the digits stay readable against
+   the animated gradient background. */
+#score-display {
+    display: inline-block;
+    margin: 0.5rem auto;
+    padding: 6px 16px;
+    background: var(--surface-strong);
+    color: var(--ink);
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    text-shadow: none;
+}
+#score-display span {
+    font-weight: 800;
+    color: var(--accent);
+}
+
+/* Game board: glassy surface holding the grid.
+   Width is capped by both viewport axes so the page never scrolls. */
 #game-board {
     margin: 10px auto;
-    width: min(95vw, calc((100svh - 260px) * var(--cols, 4) / var(--rows, 4)));
+    width: min(95vw, calc((100svh - 300px) * var(--cols, 4) / var(--rows, 4)));
     aspect-ratio: var(--cols, 4) / var(--rows, 4);
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 8px;
+    background: var(--surface-strong);
+    padding: 14px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
     box-sizing: border-box;
 }
 
@@ -62,21 +218,22 @@ h1 {
     gap: 10px;
 }
 
-/* Card container styling */
-/* The card is a perspective box that holds an inner element which
-   actually rotates. The two faces sit on top of each other and one is
-   pre-rotated 180deg so we always see the front first.
-   Cell dimensions come from the grid (the board sets its own aspect
-   ratio so cells are approximately square), so we don't pin a card
-   aspect-ratio here - that used to force cards taller than their cell
-   and push the page into a scroll. */
+/* Card container - perspective box for the inner 3D flip */
 .card {
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 12px;
     cursor: pointer;
-    perspective: 600px;
+    perspective: 800px;
     min-width: 0;
     min-height: 0;
+    animation: card-in 0.45s ease both;
+}
+.card:hover:not(.flipped):not(.matched) .card__inner {
+    transform: translateY(-3px) scale(1.03);
+}
+
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.92); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
 
 .card__inner {
@@ -84,7 +241,7 @@ h1 {
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    transition: transform 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .card.flipped .card__inner,
@@ -96,90 +253,122 @@ h1 {
     position: absolute;
     inset: 0;
     backface-visibility: hidden;
-    border-radius: 5px;
+    border-radius: 12px;
     overflow: hidden;
-    background-color: #ddd;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Card cover: gradient + big "?" - replaces the old cover.jpg.
+   The gradient direction varies subtly per card via nth-of-type tints. */
+.card__face--front {
+    background: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 900;
+    font-size: clamp(1.5rem, 6vw, 3.2rem);
+    text-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.card__face--front::before {
+    content: '?';
+    transition: transform 0.3s ease;
+}
+.card:hover:not(.flipped):not(.matched) .card__face--front::before {
+    transform: scale(1.15) rotate(-6deg);
+}
+/* Add a subtle decorative dot pattern over the gradient */
+.card__face--front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.18) 1.5px, transparent 1.5px);
+    background-size: 14px 14px;
+    pointer-events: none;
 }
 
 .card__face--back {
     transform: rotateY(180deg);
+    background-color: #fff;
 }
-
 .card__face img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures images fill the square without stretching */
+    object-fit: cover;
 }
 
-/* Win / lose status colors live here so the JS just toggles a class */
-.message {
-    font-weight: bold;
-}
-.message--win {
-    color: green;
-}
-.message--lose {
-    color: red;
-}
-
-/* Optional hover effect */
-.card:hover:not(.flipped):not(.matched) {
-    transform: scale(1.05);
-}
-
-/* Difficulty preset buttons sit in their own row inside the config panel */
-#presets {
+/* Emoji categories (e.g. Animals) render the back face as text, not an
+   <img>. The clamp() keeps the glyph readable on tiny mobile cells but
+   still big and bold on a desktop board. */
+.card__face--emoji {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    flex-basis: 100%;
-    margin-top: 4px;
-}
-#presets span {
-    font-weight: bold;
-    color: #555;
-}
-#presets button {
-    padding: 4px 10px;
+    justify-content: center;
+    font-size: clamp(2rem, 8vw, 4.5rem);
+    line-height: 1;
+    background: linear-gradient(135deg, #fff, #fef6ff);
 }
 
-/* Live score readout sits between the timer and the win/lose message */
-#score-display {
-    font-size: 1rem;
-    margin: 0.25rem 0 0.5rem;
-    color: #333;
+/* Matched cards get a celebratory glow */
+.card.matched .card__face--back {
+    box-shadow: 0 0 0 3px var(--success), 0 6px 18px rgba(46, 204, 113, 0.45);
 }
 
-/* Inline validation error shown under the config panel */
+/* Win / lose status: solid pill so the message reads cleanly on top
+   of the gradient backdrop instead of relying on a text-shadow halo. */
+.message {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+.message--win,
+.message--lose {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+    text-shadow: none;
+}
+.message--win {
+    color: #fff;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+.message--lose {
+    color: #fff;
+    background: linear-gradient(135deg, #e63946, #b21f3a);
+}
+
+/* Inline validation error - plain centered red line, no pill or border. */
 #error-message {
-    color: #c0392b;
-    margin-top: 8px;
-    min-height: 1.2em;
-    font-weight: bold;
+    margin: 2px 0 0;
+    text-align: center;
+    color: var(--danger);
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 #error-message:empty {
     display: none;
 }
 
-/* Small screens: stack the config inputs vertically, tighten the board
-   padding and shrink the headings so the layout fits a phone width. */
+/* Small screens */
 @media (max-width: 600px) {
     h1 {
-        font-size: 1.5rem;
-    }
-    h2 {
-        font-size: 1.1rem;
+        font-size: 1.6rem;
+        margin: 10px 0 6px;
     }
     #config-panel {
+        padding: 12px;
+    }
+    .config-row--fields {
         flex-direction: column;
         align-items: stretch;
     }
+    .field input[type="number"],
+    .field select {
+        width: 100%;
+    }
     #game-board {
-        padding: 6px;
-        /* Mobile chrome is taller because the config panel stacks,
-           so reserve more vertical space when capping the board width. */
-        width: min(95vw, calc((100svh - 360px) * var(--cols, 4) / var(--rows, 4)));
+        padding: 8px;
+        width: min(95vw, calc((100svh - 400px) * var(--cols, 4) / var(--rows, 4)));
     }
     .board {
         gap: 6px;

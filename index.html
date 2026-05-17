@@ -10,25 +10,45 @@
     <h1>Memory Scramble</h1>
     
     <div id="config-panel">
-        <label for="rows">Rows:</label>
-        <input type="number" id="rows" min="2" max="10" step="2">
+        <!-- Row 1: input fields (label stacked above input) -->
+        <div class="config-row config-row--fields">
+            <div class="field">
+                <label for="rows">Rows</label>
+                <input type="number" id="rows" min="2" max="10" step="2">
+            </div>
+            <div class="field">
+                <label for="cols">Columns</label>
+                <input type="number" id="cols" min="2" max="10">
+            </div>
+            <div class="field">
+                <label for="time">Timeout (s)</label>
+                <input type="number" id="time" min="10" max="600" value="60">
+            </div>
+            <div class="field">
+                <label for="category">Category</label>
+                <select id="category">
+                    <option value="food">Food</option>
+                    <option value="animals">Animals</option>
+                </select>
+            </div>
+            <!-- Difficulty preset dropdown - picking Easy / Medium / Hard
+                 fills the rows/cols/time inputs and starts a new game.
+                 Capped at 4x5 because each category ships 10 unique items. -->
+            <div class="field">
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty">
+                    <option value="">Custom</option>
+                    <option value="easy"   data-rows="2" data-cols="2" data-time="30">Easy</option>
+                    <option value="medium" data-rows="4" data-cols="4" data-time="60">Medium</option>
+                    <option value="hard"   data-rows="4" data-cols="5" data-time="45">Hard</option>
+                </select>
+            </div>
+        </div>
 
-        <label for="cols">Columns:</label>
-        <input type="number" id="cols" min="2" max="10">
-
-        <label for="time">Timeout (seconds):</label>
-        <input type="number" id="time" min="10" max="600" value="60">
-
-        <button id="start-btn">Start Game</button>
-        <button id="reset-btn" hidden>Reset</button>
-
-        <!-- Quick difficulty presets - capped at 4x5 because we only ship
-             10 unique images, which limits us to 10 pairs (20 cards). -->
-        <div id="presets">
-            <span>Presets:</span>
-            <button type="button" data-rows="2" data-cols="2" data-time="30">Easy</button>
-            <button type="button" data-rows="4" data-cols="4" data-time="60">Medium</button>
-            <button type="button" data-rows="4" data-cols="5" data-time="45">Hard</button>
+        <!-- Row 2: primary actions, Start centered as the focal button -->
+        <div class="config-row config-row--actions">
+            <button id="start-btn">Start Game</button>
+            <button id="reset-btn" hidden>Reset</button>
         </div>
 
         <!-- Inline validation message shown in place of a blocking alert() -->
