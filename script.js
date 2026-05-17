@@ -17,10 +17,13 @@ let lockBoard = false;
 
 // DOM Elements
 const startBtn = document.getElementById('start-btn');
+const resetBtn = document.getElementById('reset-btn');
 const boardElement = document.getElementById('game-board');
 const timerDisplay = document.getElementById('timer-display');
 const messageDisplay = document.getElementById('message-display');
 const errorDisplay = document.getElementById('error-message');
+const matchesEl = document.getElementById('matches');
+const totalEl = document.getElementById('total');
 
 // Show a validation error inline next to the config inputs.
 // Using textContent (not innerHTML) keeps user input from being interpreted as HTML.
@@ -28,8 +31,11 @@ function showError(message) {
     errorDisplay.textContent = message;
 }
 
-// Event Listener for Game Start
+// Event Listeners for Game Start and Reset
+// Reset just replays initializeGame() with whatever values are currently
+// in the inputs, so the player can restart without re-typing them.
 startBtn.addEventListener('click', initializeGame);
+resetBtn.addEventListener('click', initializeGame);
 
 function initializeGame() {
     const rows = parseInt(document.getElementById('rows').value);
@@ -77,6 +83,12 @@ function initializeGame() {
     timeLeft = time;
 
     totalPairs = (rows * cols) / 2;
+
+    // Refresh the live score readout and reveal the reset button now that
+    // a game is actually running.
+    matchesEl.textContent = '0';
+    totalEl.textContent = String(totalPairs);
+    resetBtn.hidden = false;
 
     generateBoard(rows, cols);
     startTimer();
@@ -168,10 +180,11 @@ function checkForMatch() {
     let isMatch = flippedCards[0].dataset.value === flippedCards[1].dataset.value;
 
     if (isMatch) {
-        
+
         flippedCards[0].classList.add('matched');
         flippedCards[1].classList.add('matched');
         matchedPairs++;
+        matchesEl.textContent = String(matchedPairs);
         flippedCards = []; // Reset for the next turn
         lockBoard = false; // Unlock board
 

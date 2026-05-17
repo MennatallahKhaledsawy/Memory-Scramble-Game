@@ -15,6 +15,7 @@ Memory scramble game where players match cards before timer ends.
 - Random card distribution
 - Match checking
 - Game over screen
+- Live match counter and quick Reset
 
 ## How to Run
 1. Clone repository

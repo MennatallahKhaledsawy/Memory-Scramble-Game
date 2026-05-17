@@ -20,6 +20,7 @@
         <input type="number" id="time" min="10" max="600" value="60">
 
         <button id="start-btn">Start Game</button>
+        <button id="reset-btn" hidden>Reset</button>
 
         <!-- Inline validation message shown in place of a blocking alert() -->
         <div id="error-message" role="alert"></div>
@@ -27,6 +28,8 @@
 
     <div id="game-info">
         <h2>Time Left: <span id="timer-display">0</span></h2>
+        <!-- Live counter of matched pairs out of the total for this game -->
+        <p id="score-display">Matches: <span id="matches">0</span> / <span id="total">0</span></p>
         <h3 id="message-display"></h3>
     </div>
 

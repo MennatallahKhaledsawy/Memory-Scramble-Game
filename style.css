@@ -89,6 +89,13 @@
     transform: scale(1.05);
 }
 
+/* Live score readout sits between the timer and the win/lose message */
+#score-display {
+    font-size: 1rem;
+    margin: 0.25rem 0 0.5rem;
+    color: #333;
+}
+
 /* Inline validation error shown under the config panel */
 #error-message {
     color: #c0392b;
