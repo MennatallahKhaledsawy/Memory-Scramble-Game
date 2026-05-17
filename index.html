@@ -33,8 +33,10 @@
             </div>
             <!-- Difficulty preset dropdown - picking Easy / Medium / Hard
                  fills the rows/cols/time inputs and starts a new game.
-                 Capped at 4x5 because each category ships 10 unique items. -->
-            <div class="field">
+                 Capped at 4x5 because each category ships 10 unique items.
+                 field--full spans the entire grid row on mobile so the
+                 odd 5th field doesn't sit alone in one column. -->
+            <div class="field field--full">
                 <label for="difficulty">Difficulty</label>
                 <select id="difficulty">
                     <option value="">Custom</option>

@@ -94,6 +94,9 @@ h1 {
 }
 .field input[type="number"],
 .field select {
+    /* border-box so width:100% on mobile actually fits the grid cell
+       instead of overflowing by (padding + border) on each side. */
+    box-sizing: border-box;
     padding: 8px 10px;
     border: 2px solid transparent;
     border-radius: 10px;
@@ -359,27 +362,57 @@ h1 {
 }
 
 /* Small screens */
-@media (max-width: 600px) {
+/* Breakpoint at 768px catches phones AND tablets in portrait, so the
+   2x2 fields layout kicks in before things get cramped. */
+@media (max-width: 768px) {
     h1 {
-        font-size: 1.6rem;
-        margin: 10px 0 6px;
+        font-size: 1.4rem;
+        margin: 6px 0 4px;
     }
     #config-panel {
-        padding: 12px;
+        /* Side margin so the panel doesn't kiss the phone's edges. */
+        margin: 0 12px;
+        padding: 14px 16px;
+        gap: 14px;
     }
+    /* Fields lay out as a 2x2 grid on mobile so the panel stays roughly
+       two rows tall instead of stacking four full-width fields and
+       crowding out the board. The gaps are generous so the inputs
+       don't visually touch each other. */
     .config-row--fields {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 28px;
+        row-gap: 18px;
+    }
+    /* Difficulty (the odd 5th field) spans the full width on its own
+       row at the bottom instead of sitting alone in one column. */
+    .field--full {
+        grid-column: 1 / -1;
         align-items: stretch;
+    }
+    .config-row--actions {
+        gap: 16px;
+    }
+    .field label {
+        font-size: 0.72rem;
     }
     .field input[type="number"],
     .field select {
         width: 100%;
+        padding: 8px 10px;
+        font-size: 0.95rem;
+    }
+    #start-btn {
+        padding: 10px 28px;
+        font-size: 0.95rem;
     }
     #game-board {
         padding: 6px;
-        /* Mobile chrome is much taller because the .config-row--fields
-           stacks vertically (4 inputs on their own lines). */
-        width: min(98vw, calc((100svh - 440px) * var(--cols, 4) / var(--rows, 4)));
+        /* Slimmer mobile chrome thanks to the 2x2 fields grid - leaves
+           the board enough vertical room that the cards stay tappable.
+           100vw - 24px keeps the same 12px side margin as the panel. */
+        width: min(calc(100vw - 24px), calc((100svh - 330px) * var(--cols, 4) / var(--rows, 4)));
     }
     .board {
         gap: 4px;
