@@ -80,7 +80,59 @@ function generateBoard(rows, cols) {
 }
 
 function handleCardClick(event) {
-    // Member 2: Handle flipping logic, storing flipped cards, and checking matches
+    // Prevent clicking if board is locked, or if the card is already flipped/matched
+    if (lockBoard) return;
+    
+    const clickedCard = event.currentTarget;
+    if (clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) {
+        return; 
+    }
+
+    // Flip the card to show its actual image
+    clickedCard.classList.add('flipped');
+    const img = clickedCard.querySelector('img');
+    img.src = `images/${clickedCard.dataset.value}.jpeg`; 
+
+    flippedCards.push(clickedCard);
+
+    // If two cards are flipped, check for a match
+    if (flippedCards.length === 2) {
+        checkForMatch();
+    }
+}
+
+function checkForMatch() {
+    lockBoard = true; 
+
+    let isMatch = flippedCards[0].dataset.value === flippedCards[1].dataset.value;
+
+    if (isMatch) {
+        
+        flippedCards[0].classList.add('matched');
+        flippedCards[1].classList.add('matched');
+        matchedPairs++;
+        flippedCards = []; // Reset for the next turn
+        lockBoard = false; // Unlock board
+
+        // Check if the game is won
+        if (matchedPairs === totalPairs) {
+            clearInterval(timerInterval); 
+            messageDisplay.innerText = "Congratulations! You found all matches!";
+            messageDisplay.style.color = "green";
+        }
+    } else {
+        // Not a match: wait 1 second, then flip them back over
+        setTimeout(() => {
+            flippedCards[0].classList.remove('flipped');
+            flippedCards[0].querySelector('img').src = 'images/cover.jpg';
+            
+            flippedCards[1].classList.remove('flipped');
+            flippedCards[1].querySelector('img').src = 'images/cover.jpg';
+            
+            flippedCards = [];
+            lockBoard = false; // Unlock board
+        }, 1000); 
+    }
 }
 
 function startTimer() {
