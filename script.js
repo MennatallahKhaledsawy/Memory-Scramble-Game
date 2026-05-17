@@ -4,6 +4,7 @@ let timeLeft;
 let flippedCards = [];
 let matchedPairs = 0;
 let totalPairs = 0;
+let lockBoard = false;
 
 // DOM Elements
 const startBtn = document.getElementById('start-btn');
@@ -133,29 +134,6 @@ function checkForMatch() {
         }, 1000); 
     }
 }
-
 function startTimer() {
-    // 1. Display the starting time immediately so it doesn't wait a second to show up
-    timerDisplay.innerText = timeLeft;
-
-    // 2. Start the countdown loop
-    timerInterval = setInterval(() => {
-        timeLeft--; // Subtract 1 second
-        timerDisplay.innerText = timeLeft; // Update the HTML screen
-
-        // 3. Check for Game Over condition
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval); // Stop the clock from counting into negative numbers
-            
-            // Lock the board so the player can't click any more cards
-            
-            if (typeof lockBoard !== 'undefined') {
-                lockBoard = true; 
-            }
-            
-            // Display the required game-over message
-            messageDisplay.innerText = "Game Over! You ran out of time.";
-            messageDisplay.style.color = "red";
-        }
-    },1000); // 1000 milliseconds = 1 second
+    // Member 3: Implement countdown logic and game over state
 }
