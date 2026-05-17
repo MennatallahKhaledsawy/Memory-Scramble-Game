@@ -39,9 +39,9 @@ body {
 }
 
 h1 {
-    margin: 16px 0 8px;
+    margin: 6px 0 4px;
     text-align: center;
-    font-size: 2.2rem;
+    font-size: 1.6rem;
     font-weight: 800;
     letter-spacing: 0.5px;
     color: #fff;
@@ -53,10 +53,10 @@ h1 {
 #config-panel {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     max-width: 820px;
     margin: 0 auto;
-    padding: 16px 20px;
+    padding: 10px 16px;
     background: var(--surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -145,15 +145,21 @@ h1 {
     border: 2px solid var(--accent);
 }
 
-/* Center the game info row, white text on the gradient backdrop. */
+/* Game info row: timer, score and status message on one horizontal
+   line, centered. Compact so the board can keep more vertical room. */
 #game-info {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 6px 0;
     color: #fff;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 #game-info h2 {
-    margin: 10px 0 4px;
-    font-size: 1.1rem;
+    margin: 0;
+    font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -161,31 +167,32 @@ h1 {
 #game-info h2 span {
     display: inline-block;
     min-width: 2ch;
-    padding: 2px 12px;
+    padding: 1px 10px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     font-weight: 800;
-    margin-left: 6px;
+    margin-left: 4px;
 }
 #game-info h3 {
-    margin: 6px 0;
-    min-height: 1.2em;
-    font-size: 1.1rem;
+    margin: 0;
+    font-size: 1rem;
+}
+#game-info h3:empty {
+    display: none;
 }
 
 /* Live score readout - solid pill so the digits stay readable against
    the animated gradient background. */
 #score-display {
-    display: inline-block;
-    margin: 0.5rem auto;
-    padding: 6px 16px;
+    margin: 0;
+    padding: 4px 12px;
     background: var(--surface-strong);
     color: var(--ink);
     border-radius: 999px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     box-shadow: var(--shadow-sm);
@@ -201,12 +208,12 @@ h1 {
    The subtracted constant is the height the header + config panel +
    game-info take up; bump it if you add more chrome above the board. */
 #game-board {
-    margin: 8px auto;
-    width: min(95vw, calc((100svh - 360px) * var(--cols, 4) / var(--rows, 4)));
+    margin: 6px auto;
+    width: min(98vw, calc((100svh - 250px) * var(--cols, 4) / var(--rows, 4)));
     aspect-ratio: var(--cols, 4) / var(--rows, 4);
     background: var(--surface-strong);
-    padding: 14px;
-    border-radius: 20px;
+    padding: 8px;
+    border-radius: 18px;
     box-shadow: var(--shadow-lg);
     box-sizing: border-box;
 }
@@ -217,7 +224,7 @@ h1 {
     display: grid;
     grid-template-columns: repeat(var(--cols, 4), 1fr);
     grid-template-rows: repeat(var(--rows, 4), 1fr);
-    gap: 10px;
+    gap: 6px;
 }
 
 /* Card container - perspective box for the inner 3D flip */
@@ -369,12 +376,12 @@ h1 {
         width: 100%;
     }
     #game-board {
-        padding: 8px;
+        padding: 6px;
         /* Mobile chrome is much taller because the .config-row--fields
            stacks vertically (4 inputs on their own lines). */
-        width: min(95vw, calc((100svh - 560px) * var(--cols, 4) / var(--rows, 4)));
+        width: min(98vw, calc((100svh - 440px) * var(--cols, 4) / var(--rows, 4)));
     }
     .board {
-        gap: 6px;
+        gap: 4px;
     }
 }
