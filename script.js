@@ -101,8 +101,10 @@ function handleCardClick(event) {
     }
 }
 
-function checkForMatch() {
-    lockBoard = true; 
+
+function startTimer() {
+    // 1. Display the starting time immediately so it doesn't wait a second to show up
+    timerDisplay.innerText = timeLeft;
 
     let isMatch = flippedCards[0].dataset.value === flippedCards[1].dataset.value;
 
@@ -129,11 +131,9 @@ function checkForMatch() {
             flippedCards[1].classList.remove('flipped');
             flippedCards[1].querySelector('img').src = 'images/cover.jpg';
             
-            flippedCards = [];
-            lockBoard = false; // Unlock board
-        }, 1000); 
-    }
-}
-function startTimer() {
-    // Member 3: Implement countdown logic and game over state
+            // Display the required game-over message
+            messageDisplay.innerText = "Game Over! You ran out of time.";
+            messageDisplay.style.color = "red";
+        }
+    },1000); 
 }
