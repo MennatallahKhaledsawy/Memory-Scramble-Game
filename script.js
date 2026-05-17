@@ -45,6 +45,7 @@ function handleCardClick(event) {
     // Member 2: Handle flipping logic, storing flipped cards, and checking matches
 }
 
+
 function startTimer() {
     // 1. Display the starting time immediately so it doesn't wait a second to show up
     timerDisplay.innerText = timeLeft;
@@ -68,5 +69,5 @@ function startTimer() {
             messageDisplay.innerText = "Game Over! You ran out of time.";
             messageDisplay.style.color = "red";
         }
-    },1000); // 1000 milliseconds = 1 second
+    },1000); 
 }
