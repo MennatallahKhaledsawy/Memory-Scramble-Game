@@ -105,17 +105,37 @@ function generateBoard(rows, cols) {
     }
 
     // 4. Create the HTML elements for each card
+    // Each card is a perspective container with an inner flipper that
+    // holds a front face (cover) and a back face (the real image). The
+    // CSS rotates the inner element when the .flipped class is added,
+    // so the click handler no longer has to swap any img sources.
     for (let i = 0; i < cardValues.length; i++) {
         const card = document.createElement('div');
         card.classList.add('card');
-        
+
         // Store the value (0-9) in a data attribute to check matches later
         card.dataset.value = cardValues[i];
-        
-        const img = document.createElement('img');
-        img.src = COVER_IMAGE; // All cards start face-down
 
-        card.appendChild(img);
+        const inner = document.createElement('div');
+        inner.classList.add('card__inner');
+
+        const front = document.createElement('div');
+        front.classList.add('card__face', 'card__face--front');
+        const frontImg = document.createElement('img');
+        frontImg.src = COVER_IMAGE;
+        frontImg.alt = '';
+        front.appendChild(frontImg);
+
+        const back = document.createElement('div');
+        back.classList.add('card__face', 'card__face--back');
+        const backImg = document.createElement('img');
+        backImg.src = cardImageSrc(cardValues[i]);
+        backImg.alt = '';
+        back.appendChild(backImg);
+
+        inner.appendChild(front);
+        inner.appendChild(back);
+        card.appendChild(inner);
         card.addEventListener('click', handleCardClick);
         boardElement.appendChild(card);
     }
@@ -131,9 +151,9 @@ function handleCardClick(event) {
     }
 
     // Flip the card to show its actual image
+    // The CSS .flipped rule rotates the inner element; the back face image
+    // was already set when the card was created, so no src swap is needed.
     clickedCard.classList.add('flipped');
-    const img = clickedCard.querySelector('img');
-    img.src = cardImageSrc(clickedCard.dataset.value);
 
     flippedCards.push(clickedCard);
 
@@ -167,10 +187,7 @@ function checkForMatch() {
         // player starts a new game before the cards flip back.
         flipBackTimeout = setTimeout(() => {
             flippedCards[0].classList.remove('flipped');
-            flippedCards[0].querySelector('img').src = COVER_IMAGE;
-
             flippedCards[1].classList.remove('flipped');
-            flippedCards[1].querySelector('img').src = COVER_IMAGE;
 
             flippedCards = [];
             lockBoard = false; // Unlock board

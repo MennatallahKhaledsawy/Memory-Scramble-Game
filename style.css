@@ -17,26 +17,47 @@
 }
 
 /* Card container styling */
+/* The card is a perspective box that holds an inner element which
+   actually rotates. The two faces sit on top of each other and one is
+   pre-rotated 180deg so we always see the front first. */
 .card {
     aspect-ratio: 1 / 1; /* Keeps the cards perfectly square */
-    background-color: #ddd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    perspective: 600px;
+}
+
+.card__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
+}
+
+.card.flipped .card__inner,
+.card.matched .card__inner {
+    transform: rotateY(180deg);
+}
+
+.card__face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
     border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background-color: #ddd;
 }
 
-.card {
-    cursor: pointer;
+.card__face--back {
+    transform: rotateY(180deg);
 }
 
-.card img {
+.card__face img {
     width: 100%;
     height: 100%;
     object-fit: cover; /* Ensures images fill the square without stretching */
-    transition: transform 0.3s ease; /* Optional: smooth flipping effect */
 }
 
 /* Win / lose status colors live here so the JS just toggles a class */
