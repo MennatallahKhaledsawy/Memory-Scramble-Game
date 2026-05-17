@@ -197,10 +197,12 @@ h1 {
 }
 
 /* Game board: glassy surface holding the grid.
-   Width is capped by both viewport axes so the page never scrolls. */
+   Width is capped by both viewport axes so the page never scrolls.
+   The subtracted constant is the height the header + config panel +
+   game-info take up; bump it if you add more chrome above the board. */
 #game-board {
-    margin: 10px auto;
-    width: min(95vw, calc((100svh - 300px) * var(--cols, 4) / var(--rows, 4)));
+    margin: 8px auto;
+    width: min(95vw, calc((100svh - 360px) * var(--cols, 4) / var(--rows, 4)));
     aspect-ratio: var(--cols, 4) / var(--rows, 4);
     background: var(--surface-strong);
     padding: 14px;
@@ -368,7 +370,9 @@ h1 {
     }
     #game-board {
         padding: 8px;
-        width: min(95vw, calc((100svh - 400px) * var(--cols, 4) / var(--rows, 4)));
+        /* Mobile chrome is much taller because the .config-row--fields
+           stacks vertically (4 inputs on their own lines). */
+        width: min(95vw, calc((100svh - 560px) * var(--cols, 4) / var(--rows, 4)));
     }
     .board {
         gap: 6px;

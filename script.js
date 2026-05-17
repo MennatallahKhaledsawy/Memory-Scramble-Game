@@ -29,6 +29,63 @@ const CATEGORIES = {
     },
 };
 
+// Sound Effects (Web Audio API)
+// Synthesized on the fly so we don't ship any audio files. The
+// AudioContext is created lazily on first use because browsers block
+// audio until the user has interacted with the page - by the time any
+// SFX fires the player has already clicked Start or a card, so that
+// gesture requirement is always met.
+let audioCtx = null;
+function getAudioCtx() {
+    if (!audioCtx) {
+        const Ctor = window.AudioContext || window.webkitAudioContext;
+        audioCtx = Ctor ? new Ctor() : null;
+    }
+    return audioCtx;
+}
+
+// Play one short tone. Each note runs through a gain node with a quick
+// attack and exponential release so the sounds feel like little blips
+// instead of harsh on/off clicks.
+function playTone(freq, durationMs, type = 'sine', gain = 0.15, startOffsetMs = 0) {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const startAt = ctx.currentTime + startOffsetMs / 1000;
+    const stopAt = startAt + durationMs / 1000;
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    env.gain.setValueAtTime(0.0001, startAt);
+    env.gain.linearRampToValueAtTime(gain, startAt + 0.01);
+    env.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+    osc.connect(env).connect(ctx.destination);
+    osc.start(startAt);
+    osc.stop(stopAt + 0.05);
+}
+
+// Match: pleasant rising two-note chirp (C5 -> E5).
+function playMatchSfx() {
+    playTone(523.25, 120, 'sine', 0.18);
+    playTone(659.25, 160, 'sine', 0.18, 100);
+}
+// Wrong: short low square-wave buzz (G3).
+function playWrongSfx() {
+    playTone(196.00, 220, 'square', 0.10);
+}
+// Win: ascending arpeggio C5 E5 G5 C6.
+function playWinSfx() {
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+        playTone(f, 200, 'triangle', 0.2, i * 130);
+    });
+}
+// Lose: slow descending sawtooth A4 -> F#4 -> D4.
+function playLoseSfx() {
+    [440.00, 369.99, 293.66].forEach((f, i) => {
+        playTone(f, 280, 'sawtooth', 0.14, i * 200);
+    });
+}
+
 // Global State Variables
 let timerInterval = null;
 let flipBackTimeout = null;
@@ -242,15 +299,22 @@ function checkForMatch() {
         lockBoard = false; // Unlock board
 
         // Check if the game is won
+        // On the final match we skip the match-chirp and only play the
+        // win arpeggio, so the two SFX don't stack on top of each other.
         if (matchedPairs === totalPairs) {
             clearInterval(timerInterval);
             messageDisplay.innerText = "Congratulations! You found all matches!";
             messageDisplay.className = 'message message--win';
+            playWinSfx();
+        } else {
+            playMatchSfx();
         }
     } else {
-        // Not a match: wait a moment, then flip them back over.
-        // Capture the timeout id so initializeGame() can cancel it if the
-        // player starts a new game before the cards flip back.
+        // Not a match: play the wrong-buzz, then wait a moment and flip
+        // the cards back over. Capture the timeout id so initializeGame()
+        // can cancel it if the player starts a new game before the cards
+        // flip back.
+        playWrongSfx();
         flipBackTimeout = setTimeout(() => {
             flippedCards[0].classList.remove('flipped');
             flippedCards[1].classList.remove('flipped');
@@ -281,6 +345,7 @@ function startTimer() {
             // Display the required game-over message
             messageDisplay.innerText = "Game Over! You ran out of time.";
             messageDisplay.className = 'message message--lose';
+            playLoseSfx();
         }
     }, 1000);
 }
